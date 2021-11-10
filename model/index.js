@@ -7,23 +7,8 @@ const Contacts = require("../service");
 const contacts = path.join(__dirname, "/contacts.json");
 
 const listContacts = async () => {
+  console.log(Contacts.find());
   return Contacts.find();
-};
-
-const getTaskById = (id) => {
-  return Task.findOne({ _id: id });
-};
-
-const createTask = ({ title, text }) => {
-  return Task.create({ title, text });
-};
-
-const updateTask = (id, fields) => {
-  return Task.findByIdAndUpdate({ _id: id }, fields, { new: true });
-};
-
-const removeTask = (id) => {
-  return Task.findByIdAndRemove({ _id: id });
 };
 
 // const listContacts = async () => {

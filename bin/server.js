@@ -26,8 +26,8 @@ const dataBase = async () => {
     process.exit(1);
   }
 };
+dataBase();
 
 app.listen(PORT, () => {
   console.log(`Server running. Use our API on port: ${PORT}`);
 });
-// dataBase();
