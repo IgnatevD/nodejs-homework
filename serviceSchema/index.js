@@ -4,7 +4,7 @@ const { number } = require("joi");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const contactsShema = new Schema({
+const ContactsShema = new Schema({
   name: {
     type: String,
     minlength: 2,
@@ -25,6 +25,6 @@ const contactsShema = new Schema({
   },
 });
 
-const Contacts = mongoose.model("Contacts", contactsShema);
+const Contacts = mongoose.model("Contacts", ContactsShema);
 
 module.exports = Contacts;

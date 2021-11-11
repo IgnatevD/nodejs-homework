@@ -31,7 +31,8 @@ router.get("/contacts", async (req, res, next) => {
 });
 
 router.get("/contacts/:id", async (req, res, next) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
+
   try {
     const result = await Contacts.findById(id);
     if (result) {
