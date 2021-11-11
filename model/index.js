@@ -6,15 +6,26 @@ const Contacts = require("../service");
 
 const contacts = path.join(__dirname, "/contacts.json");
 
-const listContacts = async () => {
-  console.log(Contacts.find());
-  return Contacts.find();
+const getDB = async (req, res, next) => {
+  try {
+    const results = await Contacts.find();
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        contacts: results,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 };
-
-// const listContacts = async () => {
-//   const readFileContacts = await fs.readFile(contacts, "utf-8");
-//   return JSON.parse(readFileContacts);
-// };
+const listContacts = async () => {
+  const readFileContacts = await fs.readFile(contacts, "utf-8");
+  console.log(Contacts.find());
+  return JSON.parse(readFileContacts);
+};
 
 const getContactById = async (contactId) => {
   const listContact = await listContacts();
@@ -65,4 +76,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  getDB,
 };

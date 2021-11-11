@@ -1,5 +1,6 @@
 /** @format */
 
+const { number } = require("joi");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -12,7 +13,7 @@ const contactsShema = new Schema({
     type: String,
   },
   phone: {
-    type: String,
+    type: Number,
   },
   favorite: {
     type: Boolean,
@@ -20,6 +21,6 @@ const contactsShema = new Schema({
   },
 });
 
-const Contacts = mongoose.model("contactsShema", contactsShema);
+const Contacts = mongoose.model("Contacts", contactsShema);
 
 module.exports = Contacts;

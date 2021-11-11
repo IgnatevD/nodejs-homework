@@ -9,9 +9,20 @@ const {
   removeContact,
   addContact,
   updateContact,
+  getDB,
 } = require("../model/index");
+const Contacts = require("../service");
 
 const router = express.Router();
+
+router.get("/contacts", async (req, res, next) => {
+  try {
+    const contacts = await getDB();
+    return res.status(200).send(contacts);
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get("/", async (req, res, next) => {
   try {
