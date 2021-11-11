@@ -8,12 +8,25 @@ require("dotenv").config();
 const PORT = process.env.PORT || 5500;
 const DB_URL = process.env.DB_URL;
 
+const dataBaseNew = async () => {
+  try {
+    await mongoose.connect(DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Database connection successful");
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
+};
+
+dataBaseNew();
+
 const dataBase = mongoose.connect(DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
-console.log(DB_URL);
 
 dataBase
   .then(() => {
