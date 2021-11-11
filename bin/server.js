@@ -23,17 +23,21 @@ const dataBaseNew = async () => {
 
 dataBaseNew();
 
-const dataBase = mongoose.connect(DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+// const dataBase = mongoose.connect(DB_URL, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
+
+app.listen(PORT, function () {
+  console.log(`Server running. Use our API on port: ${PORT}`);
 });
 
-dataBase
-  .then(() => {
-    app.listen(PORT, function () {
-      console.log(`Server running. Use our API on port: ${PORT}`);
-    });
-  })
-  .catch((err) =>
-    console.log(`Server not running. Error message: ${err.message}`)
-  );
+// dataBase
+//   .then(() => {
+//     app.listen(PORT, function () {
+//       console.log(`Server running. Use our API on port: ${PORT}`);
+//     });
+//   })
+//   .catch((err) =>
+//     console.log(`Server not running. Error message: ${err.message}`)
+//   );
