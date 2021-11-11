@@ -6,7 +6,7 @@ const Contacts = require("../service");
 
 const contacts = path.join(__dirname, "/contacts.json");
 
-const getDB = async (req, res, next) => {
+const getDB = async () => {
   try {
     const results = await Contacts.find();
     res.json({

@@ -17,10 +17,17 @@ const router = express.Router();
 
 router.get("/contacts", async (req, res, next) => {
   try {
-    const contacts = await getDB();
-    return res.status(200).send(contacts);
-  } catch (err) {
-    next(err);
+    const results = await Contacts.find();
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        contacts: results,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    next(e);
   }
 });
 

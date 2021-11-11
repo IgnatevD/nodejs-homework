@@ -20,7 +20,7 @@ const dataBaseNew = async () => {
     process.exit(1);
   }
 };
-
+console.log(DB_URL);
 dataBaseNew();
 
 // const dataBase = mongoose.connect(DB_URL, {
