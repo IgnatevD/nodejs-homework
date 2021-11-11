@@ -9,9 +9,8 @@ const {
   removeContact,
   addContact,
   updateContact,
-  getDB,
 } = require("../model/index");
-const Contacts = require("../service");
+const Contacts = require("../serviceSchema");
 
 const router = express.Router();
 
@@ -25,6 +24,30 @@ router.get("/contacts", async (req, res, next) => {
         contacts: results,
       },
     });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.get("/contacts/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const result = await Contacts.findById(id);
+    if (result) {
+      res.json({
+        status: "success",
+        code: 200,
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Not found task id: ${id}`,
+        data: "Not Found",
+      });
+    }
   } catch (e) {
     console.error(e);
     next(e);

@@ -20,17 +20,17 @@ const dataBaseNew = async () => {
     process.exit(1);
   }
 };
-console.log(DB_URL);
+
 dataBaseNew();
+
+app.listen(PORT, () => {
+  console.log(`Server running. Use our API on port: ${PORT}`);
+});
 
 // const dataBase = mongoose.connect(DB_URL, {
 //   useNewUrlParser: true,
 //   useUnifiedTopology: true,
 // });
-
-app.listen(PORT, function () {
-  console.log(`Server running. Use our API on port: ${PORT}`);
-});
 
 // dataBase
 //   .then(() => {

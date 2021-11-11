@@ -2,28 +2,11 @@
 
 const fs = require("fs/promises");
 const path = require("path");
-const Contacts = require("../service");
 
 const contacts = path.join(__dirname, "/contacts.json");
 
-const getDB = async () => {
-  try {
-    const results = await Contacts.find();
-    res.json({
-      status: "success",
-      code: 200,
-      data: {
-        contacts: results,
-      },
-    });
-  } catch (e) {
-    console.error(e);
-    next(e);
-  }
-};
 const listContacts = async () => {
   const readFileContacts = await fs.readFile(contacts, "utf-8");
-  console.log(Contacts.find());
   return JSON.parse(readFileContacts);
 };
 
@@ -76,5 +59,4 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
-  getDB,
 };
