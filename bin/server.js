@@ -26,18 +26,3 @@ dataBaseNew();
 app.listen(PORT, () => {
   console.log(`Server running. Use our API on port: ${PORT}`);
 });
-
-// const dataBase = mongoose.connect(DB_URL, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// });
-
-// dataBase
-//   .then(() => {
-//     app.listen(PORT, function () {
-//       console.log(`Server running. Use our API on port: ${PORT}`);
-//     });
-//   })
-//   .catch((err) =>
-//     console.log(`Server not running. Error message: ${err.message}`)
-//   );
