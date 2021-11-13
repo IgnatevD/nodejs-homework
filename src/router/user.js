@@ -4,10 +4,12 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
+const gravatar = require("gravatar");
 const User = require("../serviceSchema/user");
 require("dotenv").config();
 const { registrUsers, updateUsers, loginUsers } = require("../helpers/schema");
 const { validate } = require("../helpers/validate");
+const { upload } = require("../helpers/addImg");
 const secret = process.env.SECRET;
 
 const auth = (req, res, next) => {
@@ -54,34 +56,39 @@ router.post("/login", validate(loginUsers), async (req, res, next) => {
   });
 });
 
-router.post("/signup", validate(registrUsers), async (req, res, next) => {
-  const { username, email, password, subscription } = req.body;
-  const user = await User.findOne({ email });
-  if (user) {
-    return res.status(409).json({
-      status: "error",
-      code: 409,
-      message: "Email is already in use",
-      data: "Conflict",
-    });
+router.post(
+  "/signup",
+  upload.single("avatar"),
+  validate(registrUsers),
+  async (req, res, next) => {
+    const { username, email, password, subscription } = req.body;
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(409).json({
+        status: "error",
+        code: 409,
+        message: "Email is already in use",
+        data: "Conflict",
+      });
+    }
+    try {
+      const newUser = new User({ username, email, subscription });
+      newUser.setPassword(password);
+      await newUser.save();
+      res.status(201).json({
+        status: "success",
+        code: 201,
+        data: {
+          message: "Registration successful",
+          email,
+          subscription,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-  try {
-    const newUser = new User({ username, email, subscription });
-    newUser.setPassword(password);
-    await newUser.save();
-    res.status(201).json({
-      status: "success",
-      code: 201,
-      data: {
-        message: "Registration successful",
-        email,
-        subscription,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+);
 
 router.post("/logout", auth, async (req, res, next) => {
   try {
