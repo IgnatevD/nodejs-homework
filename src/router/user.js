@@ -9,7 +9,7 @@ const User = require("../serviceSchema/user");
 require("dotenv").config();
 const { registrUsers, updateUsers, loginUsers } = require("../helpers/schema");
 const { validate } = require("../helpers/validate");
-const { upload } = require("../helpers/addImg");
+const { upload, compressImg } = require("../helpers/addImg");
 const secret = process.env.SECRET;
 
 const auth = (req, res, next) => {
@@ -59,6 +59,7 @@ router.post("/login", validate(loginUsers), async (req, res, next) => {
 router.post(
   "/signup",
   upload.single("avatar"),
+  compressImg,
   validate(registrUsers),
   async (req, res, next) => {
     const { username, email, password, subscription } = req.body;
