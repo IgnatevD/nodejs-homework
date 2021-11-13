@@ -5,6 +5,7 @@ const logger = require("morgan");
 const cors = require("cors");
 
 const contactsRouter = require("./router/contacts");
+const usersRouter = require("./router/user");
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json({ limit: 100000 }));
 
+require("./config/config");
+app.use("/", usersRouter);
 app.use("/", contactsRouter);
 
 app.use((req, res) => {
