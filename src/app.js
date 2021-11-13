@@ -15,6 +15,9 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json({ limit: 100000 }));
 
+app.use(express.static("public"));
+console.log(__dirname);
+
 require("./config/config");
 app.use("/", usersRouter);
 app.use("/", contactsRouter);
