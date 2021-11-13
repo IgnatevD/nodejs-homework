@@ -55,7 +55,7 @@ router.post("/login", validate(loginUsers), async (req, res, next) => {
 });
 
 router.post("/signup", validate(registrUsers), async (req, res, next) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, subscription } = req.body;
   const user = await User.findOne({ email });
   if (user) {
     return res.status(409).json({
@@ -66,7 +66,7 @@ router.post("/signup", validate(registrUsers), async (req, res, next) => {
     });
   }
   try {
-    const newUser = new User({ username, email });
+    const newUser = new User({ username, email, subscription });
     newUser.setPassword(password);
     await newUser.save();
     res.status(201).json({
@@ -74,7 +74,8 @@ router.post("/signup", validate(registrUsers), async (req, res, next) => {
       code: 201,
       data: {
         message: "Registration successful",
-        email: email,
+        email,
+        subscription,
       },
     });
   } catch (error) {
@@ -91,15 +92,14 @@ router.post("/logout", auth, async (req, res, next) => {
   }
 });
 
-router.get("/list", auth, (req, res, next) => {
-  const { username } = req.user;
-  res.json({
-    status: "success",
-    code: 200,
-    data: {
-      message: `Authorization was successful: ${username}`,
-    },
-  });
+router.get("/current", auth, async (req, res, next) => {
+  try {
+    return res
+      .status(200)
+      .send({ email: req.user.email, subscription: req.user.subscription });
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
