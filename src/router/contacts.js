@@ -3,7 +3,7 @@
 const express = require("express");
 const { creatPost, creatPatch, updateFavorite } = require("../helpers/schema");
 const { validate } = require("../helpers/validate");
-const Contacts = require("../serviceSchema");
+const Contacts = require("../serviceSchema/contacts");
 
 const router = express.Router();
 
