@@ -1,70 +1,159 @@
 /** @format */
 
 const express = require("express");
-const { creatPost, creatPatch } = require("../helpers/schema");
+const { creatPost, creatPatch, updateFavorite } = require("../helpers/schema");
 const { validate } = require("../helpers/validate");
-const {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-} = require("../model/index");
+const Contacts = require("../serviceSchema");
 
 const router = express.Router();
 
-router.get("/", async (req, res, next) => {
+router.get("/contacts", async (req, res, next) => {
   try {
-    const allContacts = await listContacts();
-    return res.status(200).send(allContacts);
-  } catch (err) {
-    next(err);
+    const results = await Contacts.find();
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        contacts: results,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    next(e);
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/contacts/:id", async (req, res, next) => {
+  const id = req.params.id;
+
   try {
-    const contactId = await getContactById(req.params.id);
-    if (!contactId) res.status(404).send({ message: "Not found" });
-    return res.status(200).send(contactId);
-  } catch (err) {
-    next(err);
+    const results = await Contacts.findById(id);
+    if (results) {
+      res.json({
+        status: "success",
+        code: 200,
+        data: { contact: results },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Not found contacnt id: ${id}`,
+        data: "Not Found",
+      });
+    }
+  } catch (e) {
+    console.error(e);
+    next(e);
   }
 });
 
-router.post("/", validate(creatPost), async (req, res, next) => {
+router.post("/contacts", validate(creatPost), async (req, res, next) => {
+  const { name, email, phone } = req.body;
   try {
-    const { name, email, phone } = req.body;
-    if (!(name && email && phone))
-      return res.status(400).send({ message: "missing required name field" });
-    const contactAdd = await addContact(req.body);
-    return res.status(201).send(contactAdd);
-  } catch (err) {
-    next(err);
+    const result = await Contacts.create({ name, email, phone });
+
+    res.status(201).json({
+      status: "success",
+      code: 201,
+      data: { contact: result },
+    });
+  } catch (e) {
+    console.error(e);
+    next(e);
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
-  try {
-    const contactId = req.params.id;
-    const contactDel = await removeContact(contactId);
+router.delete("/contacts/:id", async (req, res, next) => {
+  const { id } = req.params;
 
-    if (!contactDel) res.status(404).send({ message: "Not found" });
-    return res.status(200).send({ message: "contact deleted" });
-  } catch (err) {
-    next(err);
+  try {
+    const result = await Contacts.findByIdAndRemove({ _id: id });
+    if (result) {
+      res.json({
+        status: "success",
+        code: 200,
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Not found contacnt id: ${id}`,
+        data: "Not Found",
+      });
+    }
+  } catch (e) {
+    console.error(e);
+    next(e);
   }
 });
 
-router.patch("/:id", validate(creatPatch), async (req, res, next) => {
+router.patch("/contacts/:id", validate(creatPatch), async (req, res, next) => {
+  const { id } = req.params;
+  const { name, email, phone } = req.body;
   try {
-    const contactId = req.params.id;
-    const contactPatch = await updateContact(contactId, req.body);
-    if (!contactPatch) res.status(404).send({ message: "Not found" });
-    return res.status(200).send(contactPatch);
-  } catch (err) {
-    next(err);
+    const result = await Contacts.findByIdAndUpdate(
+      { _id: id },
+      { name, email, phone },
+      {
+        new: true,
+      }
+    );
+    if (result) {
+      res.json({
+        status: "success",
+        code: 200,
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Not found contact id: ${id}`,
+        data: "Not Found",
+      });
+    }
+  } catch (e) {
+    console.error(e);
+    next(e);
   }
 });
+
+router.patch(
+  "/contacts/:id/favorite",
+  validate(updateFavorite),
+  async (req, res, next) => {
+    const { id } = req.params;
+    const { favorite } = req.body;
+
+    try {
+      const result = await Contacts.findByIdAndUpdate(
+        { _id: id },
+        { favorite },
+        {
+          new: true,
+        }
+      );
+      if (result) {
+        res.json({
+          status: "success",
+          code: 200,
+          data: { contact: result },
+        });
+      } else {
+        res.status(404).json({
+          status: "error",
+          code: 404,
+          message: `Not found contact id: ${id}`,
+          data: "Not Found",
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      next(e);
+    }
+  }
+);
 
 module.exports = router;
