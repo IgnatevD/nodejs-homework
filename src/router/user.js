@@ -2,6 +2,7 @@
 
 const express = require("express");
 const router = express.Router();
+const path = require("path");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const gravatar = require("gravatar");
@@ -56,40 +57,38 @@ router.post("/login", validate(loginUsers), async (req, res, next) => {
   });
 });
 
-router.post(
-  "/signup",
-  upload.single("avatar"),
-  compressImg,
-  validate(registrUsers),
-  async (req, res, next) => {
-    const { username, email, password, subscription } = req.body;
-    const user = await User.findOne({ email });
-    if (user) {
-      return res.status(409).json({
-        status: "error",
-        code: 409,
-        message: "Email is already in use",
-        data: "Conflict",
-      });
-    }
-    try {
-      const newUser = new User({ username, email, subscription });
-      newUser.setPassword(password);
-      await newUser.save();
-      res.status(201).json({
-        status: "success",
-        code: 201,
-        data: {
-          message: "Registration successful",
-          email,
-          subscription,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
+router.post("/signup", validate(registrUsers), async (req, res, next) => {
+  const { username, email, password, subscription } = req.body;
+  const user = await User.findOne({ email });
+  if (user) {
+    return res.status(409).json({
+      status: "error",
+      code: 409,
+      message: "Email is already in use",
+      data: "Conflict",
+    });
   }
-);
+
+  try {
+    //ссылка на аватарку пользователя
+    const avatarURL = gravatar.url(email, { s: "250" });
+
+    const newUser = new User({ username, email, subscription, avatarURL });
+    newUser.setPassword(password);
+    await newUser.save();
+    res.status(201).json({
+      status: "success",
+      code: 201,
+      data: {
+        message: "Registration successful",
+        email,
+        subscription,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.post("/logout", auth, async (req, res, next) => {
   try {
@@ -109,5 +108,27 @@ router.get("/current", auth, async (req, res, next) => {
     next(err);
   }
 });
+
+router.patch(
+  "/avatar",
+  auth,
+  upload.single("avatar"),
+  compressImg,
+  async (req, res, next) => {
+    const uploadDir = path.join(__dirname, "../../public/avatars");
+    try {
+      if (!req.file) {
+        throw new BadRequest("avatarURL is required");
+      }
+      const avatarNewURL = path.join(uploadDir, req.file.filename);
+      await User.findByIdAndUpdate(req.user._id, {
+        avatarURL: avatarNewURL,
+      });
+      return res.status(200).send("Avatar updated");
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 module.exports = router;
