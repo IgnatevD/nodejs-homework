@@ -2,12 +2,15 @@
 
 const express = require("express");
 const router = express.Router();
+const path = require("path");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
+const gravatar = require("gravatar");
 const User = require("../serviceSchema/user");
 require("dotenv").config();
 const { registrUsers, updateUsers, loginUsers } = require("../helpers/schema");
 const { validate } = require("../helpers/validate");
+const { upload, compressImg } = require("../helpers/addImg");
 const secret = process.env.SECRET;
 
 const auth = (req, res, next) => {
@@ -65,8 +68,12 @@ router.post("/signup", validate(registrUsers), async (req, res, next) => {
       data: "Conflict",
     });
   }
+
   try {
-    const newUser = new User({ username, email, subscription });
+    //ссылка на аватарку пользователя
+    const avatarURL = gravatar.url(email, { s: "250" });
+
+    const newUser = new User({ username, email, subscription, avatarURL });
     newUser.setPassword(password);
     await newUser.save();
     res.status(201).json({
@@ -101,5 +108,27 @@ router.get("/current", auth, async (req, res, next) => {
     next(err);
   }
 });
+
+router.patch(
+  "/avatar",
+  auth,
+  upload.single("avatar"),
+  compressImg,
+  async (req, res, next) => {
+    const uploadDir = path.join(__dirname, "../../public/avatars");
+    try {
+      if (!req.file) {
+        throw new BadRequest("avatarURL is required");
+      }
+      const avatarNewURL = path.join(uploadDir, req.file.filename);
+      await User.findByIdAndUpdate(req.user._id, {
+        avatarURL: avatarNewURL,
+      });
+      return res.status(200).send("Avatar updated");
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 module.exports = router;

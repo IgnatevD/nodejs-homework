@@ -4,7 +4,7 @@ const bCrypt = require("bcryptjs");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  username: String,
+  username: { type: String, required: [true, "username is required"] },
   password: {
     type: String,
     required: [true, "Password is required"],
@@ -23,6 +23,7 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
+  avatarURL: { type: String, default: null },
 });
 
 userSchema.methods.setPassword = function (password) {
